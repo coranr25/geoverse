@@ -1,0 +1,90 @@
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+
+function Register() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
+
+    if (signUpError) {
+      setError(signUpError.message)
+      setLoading(false)
+      return
+    }
+
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert({ id: data.user.id, username })
+
+    if (profileError) {
+      setError(profileError.message)
+      setLoading(false)
+      return
+    }
+
+    navigate('/')
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-950">
+      <div className="bg-gray-900 p-8 rounded-xl w-full max-w-md">
+        <h1 className="text-white text-2xl font-bold mb-6">Crear cuenta</h1>
+
+        {error && (
+          <p className="text-red-400 text-sm mb-4">{error}</p>
+        )}
+
+        <div className="flex flex-col gap-4">
+          <input
+            type="text"
+            placeholder="Nombre de usuario"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="bg-gray-800 text-white px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="bg-gray-800 text-white px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="bg-gray-800 text-white px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+          </button>
+        </div>
+
+        <p className="text-gray-400 text-sm mt-6 text-center">
+          ¿Ya tienes cuenta?{' '}
+          <Link to="/login" className="text-blue-400 hover:underline">
+            Inicia sesión
+          </Link>
+        </p>
+      </div>
+    </div>
+  )
+}
+
+export default Register
