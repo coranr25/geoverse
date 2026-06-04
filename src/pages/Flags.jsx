@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
-
 import { countries } from '../lib/countries'
 
 function shuffle(array) {
@@ -30,8 +29,7 @@ function Flags() {
     if (!input.trim()) return
 
     const answer = input.trim().toLowerCase()
-    const correct =
-      answer === country.name_es || answer === country.name_en
+    const correct = answer === country.name_es || answer === country.name_en
 
     if (correct) {
       setScore((s) => s + 1)
@@ -66,20 +64,20 @@ function Flags() {
     navigate('/')
   }
 
-  if (queue.length === 0) return <div className="min-h-screen bg-gray-950" />
+  if (queue.length === 0) return <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }} />
 
   if (finished) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <div className="bg-gray-900 p-8 rounded-xl text-center max-w-sm w-full">
-          <h2 className="text-2xl font-bold mb-2">Partida terminada</h2>
-          <p className="text-gray-400 mb-6">
-            Acertaste {score} de {queue.length}
+      <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '2rem', textAlign: 'center', maxWidth: '360px', width: '100%' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>Partida terminada</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+            Acertaste <span style={{ color: 'var(--primary)', fontWeight: '700' }}>{score}</span> de {queue.length}
           </p>
           <button
             onClick={saveScore}
             disabled={saving}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 w-full"
+            style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
           >
             {saving ? 'Guardando...' : 'Guardar y volver'}
           </button>
@@ -88,23 +86,37 @@ function Flags() {
     )
   }
 
+  const inputBorder = feedback === 'correct'
+    ? '#22c55e'
+    : feedback === 'incorrect'
+    ? '#ef4444'
+    : 'var(--border)'
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-      <div className="bg-gray-900 p-8 rounded-xl text-center max-w-sm w-full">
-        <div className="flex justify-between text-sm text-gray-400 mb-6">
-          <span>{current + 1} / {queue.length}</span>
-          <span>Puntos: {score}</span>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '2rem', textAlign: 'center', maxWidth: '380px', width: '100%' }}>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
+          >
+            ← Volver
+          </button>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{current + 1} / {queue.length}</span>
+          <span style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '0.85rem' }}>{score} pts</span>
         </div>
 
         <img
           src={`https://flagcdn.com/w320/${country.code.toLowerCase()}.png`}
           alt="Bandera"
-          className="mx-auto mb-6 rounded shadow-lg w-64"
+          style={{ width: '100%', maxWidth: '260px', borderRadius: '8px', marginBottom: '1.5rem', border: '1px solid var(--border)' }}
         />
 
-        <p className="text-gray-500 text-xs mb-3">
-         Escribe el nombre en español o inglés. Respeta los acentos (México, Brasil...).
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '0.75rem' }}>
+          Escribe el nombre en español o inglés. Respeta los acentos (México, Brasil...).
         </p>
+
         <input
           type="text"
           value={input}
@@ -112,27 +124,22 @@ function Flags() {
           onKeyDown={handleKey}
           placeholder="Nombre del país..."
           autoFocus
-          className={`w-full bg-gray-800 text-white px-4 py-3 rounded-lg outline-none focus:ring-2 mb-4 transition-colors ${
-            feedback === 'correct'
-              ? 'ring-2 ring-green-500'
-              : feedback === 'incorrect'
-              ? 'ring-2 ring-red-500'
-              : 'focus:ring-blue-500'
-          }`}
+          style={{ width: '100%', background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: `2px solid ${inputBorder}`, borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.95rem', outline: 'none', marginBottom: '0.75rem', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
         />
+
+        {feedback === 'incorrect' && (
+          <p style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+            Incorrecto. Era: {country.name_es} / {country.name_en}
+          </p>
+        )}
 
         <button
           onClick={validate}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors"
+          style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer', width: '100%' }}
         >
           Comprobar
         </button>
 
-        {feedback === 'incorrect' && (
-          <p className="text-red-400 text-sm mt-3">
-            Incorrecto. Era: {country.name_es} / {country.name_en}
-          </p>
-        )}
       </div>
     </div>
   )

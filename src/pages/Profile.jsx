@@ -79,70 +79,67 @@ function Profile() {
     setEditLoading(false)
   }
 
-  if (loading) return <div className="min-h-screen bg-white dark:bg-gray-950" />
+  if (loading) return <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }} />
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-white p-8 transition-colors">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-12">
+    <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)', padding: '2rem' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
           <button
             onClick={() => navigate('/')}
-            className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors"
+            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
           >
             ← Volver
           </button>
           <button
             onClick={toggle}
-            className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 px-4 py-2 rounded-lg text-sm transition-colors"
+            style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem 1rem', fontSize: '0.85rem', cursor: 'pointer' }}
           >
             {dark ? '☀️ Claro' : '🌙 Oscuro'}
           </button>
         </div>
 
-        <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded-xl mb-6">
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '1.5rem', marginBottom: '1rem' }}>
           {editing ? (
-            <div className="flex flex-col gap-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <input
                 type="text"
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
-                className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
                 maxLength={30}
                 autoFocus
+                style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.95rem', outline: 'none' }}
               />
               {editError && (
-                <p className="text-red-400 text-sm">{editError}</p>
+                <p style={{ color: '#ef4444', fontSize: '0.85rem', margin: 0 }}>{editError}</p>
               )}
-              <div className="flex gap-2">
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button
                   onClick={handleEditUsername}
                   disabled={editLoading}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                  style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', opacity: editLoading ? 0.6 : 1 }}
                 >
                   {editLoading ? 'Guardando...' : 'Guardar'}
                 </button>
                 <button
-                  onClick={() => {
-                    setEditing(false)
-                    setEditError(null)
-                    setNewUsername(profile.username)
-                  }}
-                  className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-sm px-4 py-2 rounded-lg transition-colors"
+                  onClick={() => { setEditing(false); setEditError(null); setNewUsername(profile.username) }}
+                  style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem 1rem', fontSize: '0.85rem', cursor: 'pointer' }}
                 >
                   Cancelar
                 </button>
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-between">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h1 className="text-2xl font-bold mb-1">{profile?.username}</h1>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">{user?.email}</p>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: '700', margin: '0 0 0.25rem' }}>{profile?.username}</h1>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>{user?.email}</p>
               </div>
               {!profile?.username_changed && (
                 <button
                   onClick={() => setEditing(true)}
-                  className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-sm px-4 py-2 rounded-lg transition-colors"
+                  style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem 1rem', fontSize: '0.85rem', cursor: 'pointer' }}
                 >
                   Editar
                 </button>
@@ -151,28 +148,28 @@ function Profile() {
           )}
 
           {best !== null && (
-            <div className="flex items-center gap-2 mt-4">
-              <span className="text-yellow-500 text-sm font-semibold">🏆 Mejor puntuación:</span>
-              <span className="text-sm font-bold">{best} / 195</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+              <span style={{ color: '#facc15', fontSize: '0.85rem', fontWeight: '600' }}>🏆 Mejor puntuación:</span>
+              <span style={{ fontSize: '0.85rem', fontWeight: '700' }}>{best} / 195</span>
             </div>
           )}
         </div>
 
-        <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded-xl">
-          <h2 className="text-lg font-semibold mb-4">Historial de partidas</h2>
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '1.5rem' }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '1rem', margin: '0 0 1rem' }}>Historial de partidas</h2>
 
           {scores.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-400 text-sm">No hay partidas todavía.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>No hay partidas todavía.</p>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {scores.map((s) => (
                 <div
                   key={s.id}
-                  className="flex justify-between items-center bg-white dark:bg-gray-800 px-4 py-3 rounded-lg"
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1rem' }}
                 >
-                  <span className="text-sm">{s.game === 'flags' ? '🏳️ Banderas' : s.game}</span>
-                  <span className="text-sm font-semibold">{s.score} pts</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span style={{ fontSize: '0.85rem' }}>{s.game === 'flags' ? '🏳️ Banderas' : s.game}</span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--primary)' }}>{s.score} pts</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                     {new Date(s.played_at).toLocaleDateString()}
                   </span>
                 </div>
@@ -180,6 +177,7 @@ function Profile() {
             </div>
           )}
         </div>
+
       </div>
     </div>
   )
