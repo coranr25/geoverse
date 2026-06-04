@@ -6,12 +6,10 @@ function Register() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [username, setUsername] = useState('')
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(e) {
-    e.preventDefault()
+  async function handleSubmit() {
     setLoading(true)
     setError(null)
 
@@ -40,13 +38,6 @@ function Register() {
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <input
-            type="text"
-            placeholder="Nombre de usuario"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.95rem', outline: 'none' }}
-          />
           <input
             type="email"
             placeholder="Email"
