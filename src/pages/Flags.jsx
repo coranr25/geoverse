@@ -3,28 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 
-const countries = [
-  { code: 'ES', name_es: 'españa', name_en: 'spain' },
-  { code: 'FR', name_es: 'francia', name_en: 'france' },
-  { code: 'DE', name_es: 'alemania', name_en: 'germany' },
-  { code: 'IT', name_es: 'italia', name_en: 'italy' },
-  { code: 'PT', name_es: 'portugal', name_en: 'portugal' },
-  { code: 'GB', name_es: 'reino unido', name_en: 'united kingdom' },
-  { code: 'US', name_es: 'estados unidos', name_en: 'united states' },
-  { code: 'MX', name_es: 'méxico', name_en: 'mexico' },
-  { code: 'BR', name_es: 'brasil', name_en: 'brazil' },
-  { code: 'AR', name_es: 'argentina', name_en: 'argentina' },
-  { code: 'JP', name_es: 'japón', name_en: 'japan' },
-  { code: 'CN', name_es: 'china', name_en: 'china' },
-  { code: 'IN', name_es: 'india', name_en: 'india' },
-  { code: 'RU', name_es: 'rusia', name_en: 'russia' },
-  { code: 'CA', name_es: 'canadá', name_en: 'canada' },
-  { code: 'AU', name_es: 'australia', name_en: 'australia' },
-  { code: 'ZA', name_es: 'sudáfrica', name_en: 'south africa' },
-  { code: 'NG', name_es: 'nigeria', name_en: 'nigeria' },
-  { code: 'EG', name_es: 'egipto', name_en: 'egypt' },
-  { code: 'SA', name_es: 'arabia saudí', name_en: 'saudi arabia' },
-]
+import { countries } from '../lib/countries'
 
 function shuffle(array) {
   return [...array].sort(() => Math.random() - 0.5)

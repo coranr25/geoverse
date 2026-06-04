@@ -15,20 +15,10 @@ function Register() {
     setLoading(true)
     setError(null)
 
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
+    const { error: signUpError } = await supabase.auth.signUp({ email, password })
 
     if (signUpError) {
       setError(signUpError.message)
-      setLoading(false)
-      return
-    }
-
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({ id: data.user.id, username })
-
-    if (profileError) {
-      setError(profileError.message)
       setLoading(false)
       return
     }
