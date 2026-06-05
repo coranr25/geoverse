@@ -25,6 +25,7 @@ function Flags() {
   const [feedback, setFeedback] = useState(null)
   const [score, setScore] = useState(0)
   const [finished, setFinished] = useState(false)
+  const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
   const [showExit, setShowExit] = useState(false)
 
@@ -34,9 +35,23 @@ function Flags() {
     setCurrent(0)
     setScore(0)
     setFinished(false)
+    setSaved(false)
     setInput('')
     setFeedback(null)
   }
+
+  useEffect(() => {
+    if (finished && !saved && user && mode !== null) {
+      setSaved(true)
+      setSaving(true)
+      supabase.from('scores').insert({
+        user_id: user.id,
+        game: 'flags',
+        score,
+        total: mode,
+      }).then(() => setSaving(false))
+    }
+  }, [finished])
 
   const country = queue[current]
 
@@ -66,18 +81,6 @@ function Flags() {
 
   function handleKey(e) {
     if (e.key === 'Enter') validate()
-  }
-
-  async function saveScore() {
-    setSaving(true)
-    await supabase.from('scores').insert({
-      user_id: user.id,
-      game: 'flags',
-      score,
-      total: mode,
-    })
-    setSaving(false)
-    navigate('/')
   }
 
   function handleExit() {
@@ -141,15 +144,16 @@ function Flags() {
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <button
-              onClick={saveScore}
+              onClick={() => navigate('/')}
               disabled={saving}
-              style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
+              style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: '600', cursor: saving ? 'not-allowed' : 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
             >
-              {saving ? 'Guardando...' : 'Guardar y volver'}
+              {saving ? 'Guardando...' : 'Volver al inicio'}
             </button>
             <button
               onClick={() => startGame(mode)}
-              style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', cursor: 'pointer', width: '100%' }}
+              disabled={saving}
+              style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', cursor: saving ? 'not-allowed' : 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
             >
               Jugar de nuevo
             </button>
