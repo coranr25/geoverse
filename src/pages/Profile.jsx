@@ -30,6 +30,7 @@ function Profile() {
         .select('*')
         .eq('user_id', user.id)
         .order('played_at', { ascending: false })
+        .limit (10)
 
       setProfile(profileData)
       setNewUsername(profileData?.username || '')

@@ -224,15 +224,23 @@ function Flags() {
           style={{ width: '100%', background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: `2px solid ${inputBorder}`, borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.95rem', outline: 'none', marginBottom: '0.75rem', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
         />
 
+        {feedback === 'correct' && (
+          <div style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid #22c55e', borderRadius: '8px', padding: '0.75rem', marginBottom: '0.75rem' }}>
+            <p style={{ color: '#22c55e', fontSize: '0.9rem', fontWeight: '600', margin: 0 }}>✓ ¡Correcto!</p>
+          </div>
+        )}
+
         {feedback === 'incorrect' && (
-          <p style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
-            Incorrecto. Era: {country.name_es} / {country.name_en}
-          </p>
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444', borderRadius: '8px', padding: '0.75rem', marginBottom: '0.75rem' }}>
+            <p style={{ color: '#ef4444', fontSize: '0.9rem', fontWeight: '600', margin: '0 0 0.25rem' }}>✗ Incorrecto</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>Era: {country.name_es} / {country.name_en}</p>
+          </div>
         )}
 
         <button
           onClick={validate}
-          style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer', width: '100%' }}
+          disabled={!!feedback}
+          style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem', fontSize: '0.95rem', fontWeight: '600', cursor: feedback ? 'not-allowed' : 'pointer', width: '100%', opacity: feedback ? 0.6 : 1 }}
         >
           Comprobar
         </button>
