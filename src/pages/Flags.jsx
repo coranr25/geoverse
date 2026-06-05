@@ -8,9 +8,17 @@ function shuffle(array) {
   return [...array].sort(() => Math.random() - 0.5)
 }
 
+const MODES = [
+  { label: '10 banderas', value: 10, description: 'Sesión rápida' },
+  { label: '25 banderas', value: 25, description: 'Sesión media' },
+  { label: '50 banderas', value: 50, description: 'Sesión larga' },
+  { label: '195 banderas', value: 195, description: 'Todas' },
+]
+
 function Flags() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const [mode, setMode] = useState(null)
   const [queue, setQueue] = useState([])
   const [current, setCurrent] = useState(0)
   const [input, setInput] = useState('')
@@ -18,15 +26,22 @@ function Flags() {
   const [score, setScore] = useState(0)
   const [finished, setFinished] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [showExit, setShowExit] = useState(false)
 
-  useEffect(() => {
-    setQueue(shuffle(countries))
-  }, [])
+  function startGame(selectedMode) {
+    setMode(selectedMode)
+    setQueue(shuffle(countries).slice(0, selectedMode))
+    setCurrent(0)
+    setScore(0)
+    setFinished(false)
+    setInput('')
+    setFeedback(null)
+  }
 
   const country = queue[current]
 
   function validate() {
-    if (!input.trim()) return
+    if (!input.trim() || feedback) return
 
     const answer = input.trim().toLowerCase()
     const correct = answer === country.name_es || answer === country.name_en
@@ -59,28 +74,86 @@ function Flags() {
       user_id: user.id,
       game: 'flags',
       score,
+      total: mode,
     })
     setSaving(false)
     navigate('/')
   }
 
-  if (queue.length === 0) return <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }} />
+  function handleExit() {
+    setShowExit(true)
+  }
+
+  function confirmExit() {
+    navigate('/')
+  }
+
+  function cancelExit() {
+    setShowExit(false)
+  }
+
+  if (!mode) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+        <div style={{ maxWidth: '420px', width: '100%' }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem', marginBottom: '2rem', padding: 0 }}
+          >
+            ← Volver
+          </button>
+
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>🏳️ Banderas</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>Elige cuántas banderas quieres adivinar</p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {MODES.map((m) => (
+              <div
+                key={m.value}
+                onClick={() => startGame(m.value)}
+                style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.25rem 1.5rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'border-color 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+              >
+                <div>
+                  <p style={{ fontWeight: '600', margin: '0 0 0.25rem', fontSize: '0.95rem' }}>{m.label}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>{m.description}</p>
+                </div>
+                <span style={{ color: 'var(--primary)', fontSize: '1.2rem' }}>→</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (finished) {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '2rem', textAlign: 'center', maxWidth: '360px', width: '100%' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>Partida terminada</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-            Acertaste <span style={{ color: 'var(--primary)', fontWeight: '700' }}>{score}</span> de {queue.length}
+          <p style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+            Acertaste <span style={{ color: 'var(--primary)', fontWeight: '700' }}>{score}</span> de {mode}
           </p>
-          <button
-            onClick={saveScore}
-            disabled={saving}
-            style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
-          >
-            {saving ? 'Guardando...' : 'Guardar y volver'}
-          </button>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+            {Math.round((score / mode) * 100)}% de aciertos
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <button
+              onClick={saveScore}
+              disabled={saving}
+              style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
+            >
+              {saving ? 'Guardando...' : 'Guardar y volver'}
+            </button>
+            <button
+              onClick={() => startGame(mode)}
+              style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', cursor: 'pointer', width: '100%' }}
+            >
+              Jugar de nuevo
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -94,16 +167,40 @@ function Flags() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+
+      {showExit && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem' }}>
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '2rem', maxWidth: '340px', width: '100%', textAlign: 'center' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.5rem' }}>¿Salir de la partida?</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>El progreso actual no se guardará.</p>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button
+                onClick={cancelExit}
+                style={{ flex: 1, background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem', fontSize: '0.9rem', cursor: 'pointer' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmExit}
+                style={{ flex: 1, background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem', fontSize: '0.9rem', fontWeight: '600', cursor: 'pointer' }}
+              >
+                Salir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '2rem', textAlign: 'center', maxWidth: '380px', width: '100%' }}>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
           <button
-            onClick={() => navigate('/')}
+            onClick={handleExit}
             style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
           >
-            ← Volver
+            ← Salir
           </button>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{current + 1} / {queue.length}</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{current + 1} / {mode}</span>
           <span style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '0.85rem' }}>{score} pts</span>
         </div>
 
