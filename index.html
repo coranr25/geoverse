@@ -3,12 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GeoVerse</title>
-   <script>
-  if (localStorage.getItem('theme') === 'light') {
-    document.documentElement.classList.add('light')
-  }
-  </script>
+
+    <title>GeoVerse — Aprende geografía jugando</title>
+    <meta name="description" content="GeoVerse es una plataforma educativa donde puedes aprender geografía jugando. Adivina banderas de 195 países y pon a prueba tus conocimientos." />
+    <meta name="keywords" content="geografía, banderas, juego educativo, aprender geografía, países del mundo" />
+    <meta name="author" content="GeoVerse" />
+
+    <meta property="og:title" content="GeoVerse — Aprende geografía jugando" />
+    <meta property="og:description" content="Adivina banderas de 195 países y aprende geografía de forma entretenida." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://geoverse.pages.dev" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="GeoVerse — Aprende geografía jugando" />
+    <meta name="twitter:description" content="Adivina banderas de 195 países y aprende geografía de forma entretenida." />
+
+    <script>
+      if (localStorage.getItem('theme') === 'light') {
+        document.documentElement.classList.add('light')
+      } else {
+        document.documentElement.classList.add('dark')
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
