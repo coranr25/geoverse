@@ -15,6 +15,12 @@ const MODES = [
   { label: '195 banderas', value: 195, description: 'Todas' },
 ]
 
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+
 function Flags() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -27,6 +33,7 @@ function Flags() {
   const [finished, setFinished] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [time, setTime] = useState(0)
   const [showExit, setShowExit] = useState(false)
 
   function startGame(selectedMode) {
@@ -38,20 +45,28 @@ function Flags() {
     setSaved(false)
     setInput('')
     setFeedback(null)
+    setTime(0)
   }
 
-useEffect(() => {
-  if (finished && !saved && user && mode !== null) {
-    setSaved(true)
-    setSaving(true)
-    supabase.from('scores').insert({
-      user_id: user.id,
-      game: 'flags',
-      score,
-      total: mode,
-    }).then(() => setSaving(false))
-  }
-}, [finished])
+  useEffect(() => {
+    if (!mode || finished) return
+    const interval = setInterval(() => setTime((t) => t + 1), 1000)
+    return () => clearInterval(interval)
+  }, [mode, finished])
+
+  useEffect(() => {
+    if (finished && !saved && user && mode !== null) {
+      setSaved(true)
+      setSaving(true)
+      supabase.from('scores').insert({
+        user_id: user.id,
+        game: 'flags',
+        score,
+        total: mode,
+        time_seconds: time,
+      }).then(() => setSaving(false))
+    }
+  }, [finished])
 
   const country = queue[current]
 
@@ -139,48 +154,52 @@ useEffect(() => {
           <p style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
             Acertaste <span style={{ color: 'var(--primary)', fontWeight: '700' }}>{score}</span> de {mode}
           </p>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
             {Math.round((score / mode) * 100)}% de aciertos
           </p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+            ⏱ Tiempo: <span style={{ color: 'var(--primary)', fontWeight: '700' }}>{formatTime(time)}</span>
+          </p>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-  {!user && (
-    <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1rem', textAlign: 'center' }}>
-      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.5rem' }}>
-        Tu puntuación no se ha guardado.
-      </p>
-      <p style={{ fontSize: '0.85rem', margin: 0 }}>
-        <span
-          onClick={() => navigate('/register')}
-          style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: '600' }}
-        >
-          Regístrate
-        </span>
-        {' '}o{' '}
-        <span
-          onClick={() => navigate('/login')}
-          style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: '600' }}
-        >
-          inicia sesión
-        </span>
-        {' '}para guardar tu progreso.
-      </p>
-    </div>
-  )}
-  <button
-    onClick={() => navigate('/')}
-    disabled={saving}
-    style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: '600', cursor: saving ? 'not-allowed' : 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
-  >
-    {saving ? 'Guardando...' : 'Volver al inicio'}
-  </button>
-  <button
-    onClick={() => startGame(mode)}
-    disabled={saving}
-    style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', cursor: saving ? 'not-allowed' : 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
-  >
-    Jugar de nuevo
-  </button>
-</div>
+            {!user && (
+              <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1rem', textAlign: 'center' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.5rem' }}>
+                  Tu puntuación no se ha guardado.
+                </p>
+                <p style={{ fontSize: '0.85rem', margin: 0 }}>
+                  <span
+                    onClick={() => navigate('/register')}
+                    style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: '600' }}
+                  >
+                    Regístrate
+                  </span>
+                  {' '}o{' '}
+                  <span
+                    onClick={() => navigate('/login')}
+                    style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: '600' }}
+                  >
+                    inicia sesión
+                  </span>
+                  {' '}para guardar tu progreso.
+                </p>
+              </div>
+            )}
+            <button
+              onClick={() => navigate('/')}
+              disabled={saving}
+              style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: '600', cursor: saving ? 'not-allowed' : 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
+            >
+              {saving ? 'Guardando...' : 'Volver al inicio'}
+            </button>
+            <button
+              onClick={() => startGame(mode)}
+              disabled={saving}
+              style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', cursor: saving ? 'not-allowed' : 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
+            >
+              Jugar de nuevo
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -220,7 +239,7 @@ useEffect(() => {
 
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '2rem', textAlign: 'center', maxWidth: '380px', width: '100%' }}>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <button
             onClick={handleExit}
             style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
@@ -228,7 +247,11 @@ useEffect(() => {
             ← Salir
           </button>
           <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{current + 1} / {mode}</span>
-          <span style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '0.85rem' }}>{score} pts</span>
+          <span style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '0.85rem' }}>{formatTime(time)}</span>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Puntos: <span style={{ color: 'var(--primary)', fontWeight: '700' }}>{score}</span></span>
         </div>
 
         <img
