@@ -40,18 +40,18 @@ function Flags() {
     setFeedback(null)
   }
 
-  useEffect(() => {
-    if (finished && !saved && user && mode !== null) {
-      setSaved(true)
-      setSaving(true)
-      supabase.from('scores').insert({
-        user_id: user.id,
-        game: 'flags',
-        score,
-        total: mode,
-      }).then(() => setSaving(false))
-    }
-  }, [finished])
+useEffect(() => {
+  if (finished && !saved && user && mode !== null) {
+    setSaved(true)
+    setSaving(true)
+    supabase.from('scores').insert({
+      user_id: user.id,
+      game: 'flags',
+      score,
+      total: mode,
+    }).then(() => setSaving(false))
+  }
+}, [finished])
 
   const country = queue[current]
 
@@ -143,21 +143,44 @@ function Flags() {
             {Math.round((score / mode) * 100)}% de aciertos
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <button
-              onClick={() => navigate('/')}
-              disabled={saving}
-              style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: '600', cursor: saving ? 'not-allowed' : 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
-            >
-              {saving ? 'Guardando...' : 'Volver al inicio'}
-            </button>
-            <button
-              onClick={() => startGame(mode)}
-              disabled={saving}
-              style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', cursor: saving ? 'not-allowed' : 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
-            >
-              Jugar de nuevo
-            </button>
-          </div>
+  {!user && (
+    <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1rem', textAlign: 'center' }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.5rem' }}>
+        Tu puntuación no se ha guardado.
+      </p>
+      <p style={{ fontSize: '0.85rem', margin: 0 }}>
+        <span
+          onClick={() => navigate('/register')}
+          style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: '600' }}
+        >
+          Regístrate
+        </span>
+        {' '}o{' '}
+        <span
+          onClick={() => navigate('/login')}
+          style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: '600' }}
+        >
+          inicia sesión
+        </span>
+        {' '}para guardar tu progreso.
+      </p>
+    </div>
+  )}
+  <button
+    onClick={() => navigate('/')}
+    disabled={saving}
+    style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: '600', cursor: saving ? 'not-allowed' : 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
+  >
+    {saving ? 'Guardando...' : 'Volver al inicio'}
+  </button>
+  <button
+    onClick={() => startGame(mode)}
+    disabled={saving}
+    style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '0.95rem', cursor: saving ? 'not-allowed' : 'pointer', width: '100%', opacity: saving ? 0.6 : 1 }}
+  >
+    Jugar de nuevo
+  </button>
+</div>
         </div>
       </div>
     )

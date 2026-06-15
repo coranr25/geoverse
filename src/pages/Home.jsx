@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
 
 function Home() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const navigate = useNavigate()
   const { dark, toggle } = useTheme()
 
@@ -12,6 +12,8 @@ function Home() {
     await supabase.auth.signOut()
     navigate('/login')
   }
+
+  if (loading) return <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }} />
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)', padding: '2rem' }}>
@@ -26,21 +28,42 @@ function Home() {
             >
               {dark ? '☀️ Claro' : '🌙 Oscuro'}
             </button>
-            <button
-              onClick={handleLogout}
-              style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem 1rem', fontSize: '0.85rem', cursor: 'pointer' }}
-            >
-              Cerrar sesión
-            </button>
+            {user && (
+              <button
+                onClick={handleLogout}
+                style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem 1rem', fontSize: '0.85rem', cursor: 'pointer' }}
+              >
+                Cerrar sesión
+              </button>
+            )}
           </div>
         </div>
 
-        <p
-          onClick={() => navigate('/profile')}
-          style={{ color: 'var(--text-muted)', marginBottom: '2rem', cursor: 'pointer', fontSize: '0.9rem' }}
-        >
-          Bienvenido, {user?.email} →
-        </p>
+        {user ? (
+          <p
+            onClick={() => navigate('/profile')}
+            style={{ color: 'var(--text-muted)', marginBottom: '2rem', cursor: 'pointer', fontSize: '0.9rem' }}
+          >
+            Bienvenido, {user.email} →
+          </p>
+        ) : (
+          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '0.9rem' }}>
+            <span
+              onClick={() => navigate('/login')}
+              style={{ color: 'var(--secondary)', cursor: 'pointer', fontWeight: '600' }}
+            >
+              Inicia sesión
+            </span>
+            {' '}o{' '}
+            <span
+              onClick={() => navigate('/register')}
+              style={{ color: 'var(--secondary)', cursor: 'pointer', fontWeight: '600' }}
+            >
+              regístrate
+            </span>
+            {' '}para guardar tu progreso.
+          </p>
+        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
           <div
