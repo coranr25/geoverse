@@ -40,9 +40,9 @@ function Glossary() {
     setDataLoading(true)
 
     try {
-      const res = await fetch(`https://restcountries.com/v3.1/alpha/${country.code}`)
-      const data = await res.json()
-      setCountryData(data[0])
+      const res = await fetch(`https://restcountries.com/v5/alpha/${country.code.toLowerCase()}?fields=capital,continents,population,area,languages,currencies`)
+        const data = await res.json()
+        setCountryData(Array.isArray(data) ? data[0] : data)
     } catch {
       setCountryData(null)
     }

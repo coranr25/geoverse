@@ -82,7 +82,6 @@ function Flags() {
     user_id: user.id,
     country_code: country.code,
   }, { onConflict: 'user_id,country_code' })
-  .then(({ data, error }) => console.log('upsert:', data, error))
 }
 } else {
   setFeedback('incorrect')
