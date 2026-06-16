@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
 import { countries } from '../lib/countries'
+import { countriesData } from '../lib/countriesData'
 
 function Glossary() {
   const { user } = useAuth()
@@ -13,7 +14,6 @@ function Glossary() {
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
   const [countryData, setCountryData] = useState(null)
-  const [dataLoading, setDataLoading] = useState(false)
 
   useEffect(() => {
     async function fetchDiscovered() {
@@ -33,22 +33,11 @@ function Glossary() {
     fetchDiscovered()
   }, [user])
 
-  async function handleSelect(country) {
-    if (!discovered.has(country.code)) return
-    setSelected(country)
-    setCountryData(null)
-    setDataLoading(true)
-
-    try {
-      const res = await fetch(`https://restcountries.com/v5/alpha/${country.code.toLowerCase()}?fields=capital,continents,population,area,languages,currencies`)
-        const data = await res.json()
-        setCountryData(Array.isArray(data) ? data[0] : data)
-    } catch {
-      setCountryData(null)
-    }
-
-    setDataLoading(false)
-  }
+  function handleSelect(country) {
+  if (!discovered.has(country.code)) return
+  setSelected(country)
+  setCountryData(countriesData[country.code] || null)
+}
 
   const discoveredCount = discovered.size
   const totalCount = countries.length
@@ -167,27 +156,23 @@ function Glossary() {
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>{selected.name_en}</p>
             </div>
 
-            {dataLoading ? (
-              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Cargando datos...</p>
-            ) : countryData ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                {[
-                  { label: '🏙️ Capital', value: countryData.capital?.[0] || '—' },
-                  { label: '🌍 Continente', value: countryData.continents?.[0] || '—' },
-                  { label: '👥 Población', value: countryData.population ? countryData.population.toLocaleString() : '—' },
-                  { label: '📐 Superficie', value: countryData.area ? `${countryData.area.toLocaleString()} km²` : '—' },
-                  { label: '🗣️ Idiomas', value: countryData.languages ? Object.values(countryData.languages).slice(0, 3).join(', ') : '—' },
-                  { label: '💰 Moneda', value: countryData.currencies ? Object.values(countryData.currencies).map(c => `${c.name} (${c.symbol})`).join(', ') : '—' },
-                ].map(({ label, value }) => (
-                  <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-elevated)', borderRadius: '10px', padding: '0.75rem 1rem' }}>
-                    <span style={{ fontSize: '0.875rem', fontWeight: '700' }}>{label}</span>
-                    <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textAlign: 'right', maxWidth: '60%' }}>{value}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>No se pudieron cargar los datos.</p>
-            )}
+            {countryData ? (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+    {[
+      { label: '🏙️ Capital', value: countryData.capital },
+      { label: '🌍 Continente', value: countryData.continent },
+      { label: '👥 Población', value: countryData.population },
+      { label: '📐 Superficie', value: countryData.area },
+    ].map(({ label, value }) => (
+      <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-elevated)', borderRadius: '10px', padding: '0.75rem 1rem' }}>
+        <span style={{ fontSize: '0.875rem', fontWeight: '700' }}>{label}</span>
+        <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textAlign: 'right', maxWidth: '60%' }}>{value || '—'}</span>
+      </div>
+    ))}
+  </div>
+) : (
+  <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Sin datos disponibles.</p>
+)}
 
             <button
               onClick={() => setSelected(null)}
