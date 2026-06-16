@@ -5,6 +5,7 @@ import Register from './pages/Register'
 import Home from './pages/Home'
 import Flags from './pages/Flags'
 import Profile from './pages/Profile'
+import Glossary from './pages/Glossary'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -24,6 +25,14 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<Home />} />
         <Route path="/flags" element={<Flags />} />
+        <Route
+          path="/glossary"
+          element={
+            <ProtectedRoute>
+              <Glossary />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/profile"
           element={

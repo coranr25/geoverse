@@ -75,11 +75,18 @@ function Flags() {
     const answer = input.trim().toLowerCase()
     const correct = answer === country.name_es || answer === country.name_en
     if (correct) {
-      setScore((s) => s + 1)
-      setFeedback('correct')
-    } else {
-      setFeedback('incorrect')
-    }
+  setScore((s) => s + 1)
+  setFeedback('correct')
+  if (user) {
+  supabase.from('discovered_countries').upsert({
+    user_id: user.id,
+    country_code: country.code,
+  }, { onConflict: 'user_id,country_code' })
+  .then(({ data, error }) => console.log('upsert:', data, error))
+}
+} else {
+  setFeedback('incorrect')
+}
     setTimeout(() => {
       setFeedback(null)
       setInput('')

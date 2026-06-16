@@ -241,6 +241,43 @@ function Home() {
 
         </div>
 
+        <div
+  onClick={() => user ? navigate('/glossary') : navigate('/register')}
+  style={{
+    background: 'var(--bg-surface)',
+    border: '2px solid var(--border)',
+    borderRadius: '20px',
+    padding: '2rem',
+    cursor: 'pointer',
+    transition: 'border-color 0.2s, transform 0.15s'
+  }}
+  onMouseEnter={e => {
+    e.currentTarget.style.borderColor = 'var(--primary)'
+    e.currentTarget.style.transform = 'translateY(-2px)'
+  }}
+  onMouseLeave={e => {
+    e.currentTarget.style.borderColor = 'var(--border)'
+    e.currentTarget.style.transform = 'translateY(0)'
+  }}
+>
+  <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🗺️</div>
+  <h3 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 0.5rem' }}>Glosario</h3>
+  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: '0 0 1.5rem', lineHeight: 1.5 }}>
+    Descubre los países que ya conoces y aprende sobre ellos.
+  </p>
+  <span style={{
+    display: 'inline-block',
+    background: 'var(--primary)',
+    color: '#fff',
+    borderRadius: '8px',
+    padding: '0.4rem 1rem',
+    fontSize: '0.875rem',
+    fontWeight: '700'
+  }}>
+    {user ? 'Ver glosario →' : 'Requiere cuenta →'}
+  </span>
+</div>
+
         {!user && (
           <div style={{
             background: 'var(--bg-surface)',
